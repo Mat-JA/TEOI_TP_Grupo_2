@@ -2,6 +2,9 @@
 
 Teoria de la Computacion I - UNLu - 2026. Tema especial: PRINCIPIO.
 
+##Miembros
+- Maria Nazarena Gonzalez - 190217
+
 ## Ejecutar
     java -jar Compilador.jar
 
