@@ -1,0 +1,3 @@
+PROGRAM.SECTION
+WRITE "esta cadena tiene mas de treinta caracteres"
+ENDPROGRAM.SECTION

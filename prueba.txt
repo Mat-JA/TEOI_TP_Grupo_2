@@ -1,0 +1,55 @@
+//* PRUEBA GENERAL - Grupo 2 - Tema especial: PRINCIPIO *//
+
+DECLARE.SECTION
+[a1, b1, resul, nombre] := [FLOAT, INT, INT, STRING]
+[p1, p2, p3] := [FLOAT, FLOAT, INT]
+ENDDECLARE.SECTION
+
+PROGRAM.SECTION
+
+//* ---- Comentario con anidado de un nivel ----
+IF (a <= 30)
+b = "correcto" //* asignacion string *//
+ENDIF
+*//
+
+//* ---- Asignaciones y constantes ---- *//
+a1 ::= 99999.99
+a1 ::= 99.
+a1 ::= .9999
+b1 ::= 32767
+b1 ::= 0
+nombre ::= "HOLA MUNDO"
+nombre ::= "hola"
+p1 ::= a1
+p3 ::= (b1 + 2) * 3 / 4 - 1
+
+//* ---- Salida ---- *//
+WRITE "@sdADaSjfla%dfg"
+WRITE 99.999
+WRITE a1
+
+//* ---- Condiciones ---- *//
+IF (a1 >= 5 AND b1 < 10) THEN
+    WRITE "ok"
+ELSE
+    WRITE "no"
+ENDIF
+
+IF (a1 == 3 OR b1 != 4)
+    WRITE b1
+ENDIF
+
+//* ---- Ciclo ---- *//
+WHILE (b1 <= 10)
+    b1 ::= b1 + 1
+ENDWHILE
+
+//* ---- Tema especial: PRINCIPIO ---- *//
+resul::= PRINCIPIO(4;[10,20,30,40,5,4]) //* La suma es: 100 *//
+resul::= PRINCIPIO(5;[2,2,2,4]) //* La lista tiene menos elementos que el indicado *//
+resul::= PRINCIPIO(1;[2,1,1,4]) //* La suma es: 2 *//
+resul::= PRINCIPIO(2;[10,20,30,40,50,40]) //* La suma es: 30 *//
+resul::= PRINCIPIO(1;[]) //* La lista esta vacia *//
+
+ENDPROGRAM.SECTION

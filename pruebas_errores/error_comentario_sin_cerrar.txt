@@ -1,0 +1,4 @@
+PROGRAM.SECTION
+//* comentario que nunca se cierra
+a ::= 1
+ENDPROGRAM.SECTION
