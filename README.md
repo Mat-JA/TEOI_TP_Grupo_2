@@ -2,7 +2,7 @@
 
 Teoria de la Computacion I - UNLu - 2026. Tema especial: PRINCIPIO.
 
-##Miembros
+## Miembros
 - Maria Nazarena Gonzalez - 190217
 
 ## Ejecutar
