@@ -5,7 +5,7 @@ Teoria de la Computacion I - UNLu - 2026. Tema especial: PRINCIPIO.
 ## Miembros
 - Maria Nazarena Gonzalez - 190217
 - Valentino Rigacci - 190150
-- Nicholas peterson - 169830
+- Nicholas Peterson - 169830
 
 ## Ejecutar
     java -jar Compilador.jar
