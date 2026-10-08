@@ -7,6 +7,7 @@ Teoria de la Computacion I - UNLu - 2026. Tema especial: PRINCIPIO.
 - Valentino Rigacci - 190150
 - Nicholas Peterson - 169830
 - Mateo Javier Ausqui - 190236
+- Melina Obregón - 168542
 
 ## Ejecutar
     java -jar Compilador.jar
