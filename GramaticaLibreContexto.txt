@@ -1,0 +1,34 @@
+Gramática libre de contexto - Grupo 2                                                                                           //DEO GLORIA
+Programa: De lo general a lo particular
+
+programa ::= DECLARE_SECTION declaraciones ENDDECLARE_SECTION PROGRAM_SECTION sentencias ENDPROGRAM_SECTION
+
+declaraciones ::= declaraciones declaración | declaración
+declaración ::= COR_A lista_tipos COR_C ASIG_DECL COR_A lista_id COR_C
+lista_tipos ::= lista_tipos COMA tipo | tipo
+lista_id ::= lista_id COMA ID | ID
+tipo ::= INTEGER | FLOAT | STRING
+
+sentencias ::= sentencias sentencia | sentencia
+sentencia ::= asignación
+sentencia ::= selección
+sentencia ::= iteración
+sentencia ::= escritura
+
+asignación ::= ID ASIGNACION expresión PUNTO_Y_COMA
+asignación ::= ID ASIGNACION CTE_STR PUNTO_Y_COMA
+selección ::= IF condición THEN sentencias ELSE sentencias ENDIF
+selección ::= IF condición THEN sentencias ENDIF
+iteración ::= WHILE condición sentencias ENDWHILE
+escritura ::= WRITE expresión PUNTO_Y_COMA
+escritura ::= WRITE CTE_STR PUNTO_Y_COMA
+
+condición ::= comparación
+condición ::= condición AND comparación
+condición ::= condición OR comparación
+comparación ::= expresión comparador expresión
+comparador ::= OP_MAYOR | OP_MENOR | OP_MAYOR_IGUAL | OP_MENOR_IGUAL | OP_IGUAL | OP_DISTINTO
+
+expresión ::= expresión OP_SUMA término | expresión OP_RESTA término | término
+término ::= término OP_MULT factor | término OP_DIV factor | factor
+factor ::= PAR_A expresión PAR_C | ID | CTE_E | CTE_F
