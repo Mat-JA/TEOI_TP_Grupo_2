@@ -14,6 +14,9 @@ sem_int_recibe_expresion_real.txt                    ERROR SEMANTICO (linea 5, c
 sem_int_recibe_real.txt                              ERROR SEMANTICO (linea 5, columna 4): La variable entera 'i1' no puede recibir un valor real
 sem_mas_tipos_que_variables.txt                      ERROR SEMANTICO (linea 2, columna 8): La declaracion tiene 2 variable(s) y 3 tipo(s): no pueden existir mas variables qu
 sem_mas_variables_que_tipos.txt                      ERROR SEMANTICO (linea 2, columna 11): La declaracion tiene 3 variable(s) y 2 tipo(s): no pueden existir mas variables q
+sem_no_declarada_asignacion.txt                      ERROR SEMANTICO (linea 5, columna 1): La variable 'x1' no fue declarada en DECLARE.SECTION
+sem_no_declarada_expresion.txt                       ERROR SEMANTICO (linea 5, columna 13): La variable 'zz' no fue declarada en DECLARE.SECTION
+sem_no_declarada_write.txt                           ERROR SEMANTICO (linea 5, columna 7): La variable 'zz' no fue declarada en DECLARE.SECTION
 sem_numerica_recibe_string.txt                       ERROR SEMANTICO (linea 5, columna 4): La variable numerica 'f1' no puede recibir una constante string
 sem_principio_lista_real_en_int.txt                  ERROR SEMANTICO (linea 5, columna 4): La variable entera 'i1' no puede recibir un valor real
 sem_principio_pivot_cero.txt                         ERROR SEMANTICO (linea 5, columna 8): El pivot de PRINCIPIO debe ser mayor o igual a 1 (se recibio 0)
@@ -50,6 +53,7 @@ sin_falta_enddeclare_section.txt                     ERROR SINTACTICO (linea 3, 
 sin_falta_endprogram_section.txt                     ERROR SINTACTICO: Fin de archivo inesperado: falta completar la estructura del programa
 sin_falta_program_section.txt                        ERROR SINTACTICO (linea 4, columna 1): Token inesperado ID (lexema 'f1')
 sin_falta_punto_y_coma.txt                           ERROR SINTACTICO (linea 6, columna 1): Token inesperado ID (lexema 'f1')
+sin_if_comparacion_parentesis_sin_cerrar.txt         ERROR SINTACTICO (linea 5, columna 13): Token inesperado AND (lexema 'AND')
 sin_if_condicion_vacia.txt                           ERROR SINTACTICO (linea 5, columna 5): Token inesperado PAR_C (lexema ')')
 sin_if_conector_sin_segunda_comparacion.txt          ERROR SINTACTICO (linea 5, columna 15): Token inesperado PAR_C (lexema ')')
 sin_if_doble_comparador.txt                          ERROR SINTACTICO (linea 5, columna 12): Token inesperado OP_MENOR (lexema '<')

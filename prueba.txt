@@ -44,6 +44,11 @@ IF (a1 == 3 OR b1 != 4) THEN
     WRITE b1;
 ENDIF
 
+//* ---- Condicion con cada comparacion entre parentesis (formato del enunciado) ---- *//
+IF ((a1 >= 5) AND (b1 < 10)) THEN
+    WRITE "ok";
+ENDIF
+
 //* ---- Ciclo ---- *//
 WHILE (b1 <= 10)
     b1 ::= b1 + 1;

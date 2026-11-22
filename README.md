@@ -3,6 +3,12 @@
 Teoria de la Computacion I - UNLu - 2026
 Tema especial: **PRINCIPIO**
 
+## Miembros
+- Maria Nazarena Gonzalez - 190217
+- Valentino Rigacci - 190150
+- Nicholas Peterson - 169830
+- Mateo Javier Ausqui - 190236
+
 Analizador lexico (JFlex), sintactico (Java CUP) y controles semanticos basicos,
 con un IDE en Swing para escribir o cargar codigo, compilarlo y ver el resultado.
 
@@ -12,7 +18,9 @@ Requiere Java 11 o superior.
     java -jar Compilador.jar
 
 En la ventana: **Abrir archivo...** (por ejemplo `prueba.txt`) y luego **Compilar**.
-La salida muestra tokens, reglas sintacticas, mensajes y errores. La pestana
+La salida muestra tokens, reglas sintacticas, mensajes y errores. Las reglas de paso que no realizan
+ninguna accion (`expresion ::= termino`, `termino ::= factor`, `sentencias ::= sentencia`,
+`sentencia ::= ...`, `declaraciones ::= declaracion`) no generan salida. La pestana
 *Tabla de simbolos* muestra la tabla; si no hay errores tambien se guarda en `ts.txt`.
 
 ## Reconstruir (requiere JDK 11+)
@@ -30,7 +38,7 @@ Genera `Lexico.java` (JFlex) y `parser.java` / `sym.java` (CUP), compila y arma
 | `Sintactico.cup` | Gramatica, acciones semanticas y mensajes de PRINCIPIO |
 | `prueba.txt` | Prueba general: declaraciones, asignaciones, WHILE, IF, WRITE y PRINCIPIO |
 | `ts.txt` | Tabla de simbolos generada al compilar `prueba.txt` |
-| `pruebas_errores/` | 80 casos: `lex_*` (10 lexicos), `sin_*` (59 sintacticos), `sem_*` (11 semanticos). `INDICE.txt` lista el error de cada uno |
+| `pruebas_errores/` | 84 casos: `lex_*` (10 lexicos), `sin_*` (60 sintacticos), `sem_*` (14 semanticos). `INDICE.txt` lista el error de cada uno |
 | `src/compilador/` | Codigo fuente. `Lexico.java`, `parser.java` y `sym.java` son generados |
 | `lib/` | JFlex 1.8.2, Java CUP 11b y su runtime |
 | `Compilador.jar` | Ejecutable |
@@ -40,7 +48,8 @@ Genera `Lexico.java` (JFlex) y `parser.java` / `sym.java` (CUP), compila y arma
 - **Declaracion:** `[a1, b1] := [FLOAT, INT]` (variables a la izquierda, tipos a la derecha).
 - **Sentencias** (terminan en `;`): asignacion `a ::= expresion;` o `a ::= "texto";`,
   `IF (cond) THEN ... [ELSE ...] ENDIF`, `WHILE (cond) ... ENDWHILE`, `WRITE ...;`.
-- **Condiciones:** comparaciones con un solo conector opcional: `(a < b AND c >= d)`.
+- **Condiciones:** comparaciones con un solo conector opcional. Cada comparacion puede ir con o sin
+  parentesis propios: `(a < b AND c >= d)` o `((a < b) AND (c >= d))`.
 - **WRITE:** cte string, cte numerica o variable numerica. Se acepta `WRITE` y `write`.
 - **Constantes:** entero 0..32767; real (`99.99`, `99.`, `.9999`) dentro del rango de un float;
   string de hasta 30 caracteres entre comillas.
@@ -61,6 +70,7 @@ por ejemplo `x ::= 4 + 3 + PRINCIPIO(4;[3,2,1,3,8]);`.
   una STRING solo recibe constantes string, una numerica no recibe strings.
 - Una variable string no puede usarse en expresiones ni en WRITE.
 - La cantidad de variables debe ser igual a la cantidad de tipos en cada declaracion.
+- Toda variable usada (asignacion, expresion o WRITE) debe estar declarada en `DECLARE.SECTION`.
 
 ## Errores
 El analisis se corta en el primer error y lo informa con linea y columna:
@@ -70,7 +80,6 @@ El analisis se corta en el primer error y lo informa con linea y columna:
 - La gramatica es la aprobada por la catedra con sus dos correcciones
   (declaracion con variables a la izquierda y PRINCIPIO dentro de `factor`).
   La unica ampliacion: la lista de PRINCIPIO admite tambien constantes reales.
-- Una variable no declarada que se usa no genera error; solo se omite el control de tipos.
 - Una variable declarada dos veces conserva el primer tipo.
 - La division entre enteros da entero.
 - Las palabras reservadas distinguen mayusculas (salvo `write`).

@@ -29,8 +29,16 @@ action code {:
         return new ErrorCompilador("SEMANTICO", mensaje, linea, columna);
     }
 
-    /* Tipo de una variable para usarla en una expresion: "Integer", "Float" o "?" (sin declarar) */
+    /* Toda variable usada debe haber sido declarada en DECLARE.SECTION */
+    void chequearDeclarada(String id, int linea, int columna) {
+        String t = Contexto.tabla.getTipo(id);
+        if (!"Integer".equals(t) && !"Float".equals(t) && !"String".equals(t))
+            throw sem("La variable '" + id + "' no fue declarada en DECLARE.SECTION", linea, columna);
+    }
+
+    /* Tipo de una variable para usarla en una expresion: "Integer" o "Float" */
     String tipoVariable(String id, int linea, int columna) {
+        chequearDeclarada(id, linea, columna);
         String t = Contexto.tabla.getTipo(id);
         if ("String".equals(t))
             throw sem("La variable string '" + id + "' no puede usarse en una expresion numerica", linea, columna);
@@ -47,6 +55,7 @@ action code {:
 
     /* Compatibilidad de una asignacion numerica: una variable Integer no recibe un valor Float */
     void chequearAsignacionNumerica(String id, String tipoValor, int linea, int columna) {
+        chequearDeclarada(id, linea, columna);
         String t = Contexto.tabla.getTipo(id);
         if ("String".equals(t))
             throw sem("A la variable string '" + id + "' solo se le puede asignar una constante string", linea, columna);
@@ -102,7 +111,7 @@ programa ::= DECLARE_SECTION declaraciones ENDDECLARE_SECTION PROGRAM_SECTION se
 
 /* ---------------------- Declaraciones ----------------------- */
 declaraciones ::= declaraciones declaracion {: regla("declaraciones ::= declaraciones declaracion"); :}
-                | declaracion               {: regla("declaraciones ::= declaracion"); :};
+                | declaracion;
 
 /* Formato (correccion de los profes): [lista de variables] := [lista de tipos], se corresponden por posicion */
 declaracion ::= COR_A lista_id:vs COR_C ASIG_DECL:op COR_A lista_tipos:ts COR_C
@@ -134,20 +143,23 @@ tipo ::= INTEGER {: RESULT = "Integer"; regla("tipo ::= INT"); :}
 
 /* ------------------------ Sentencias ------------------------ */
 sentencias ::= sentencias sentencia {: regla("sentencias ::= sentencias sentencia"); :}
-             | sentencia            {: regla("sentencias ::= sentencia"); :};
+             | sentencia;
 
-sentencia ::= asignacion {: regla("sentencia ::= asignacion"); :}
-            | seleccion  {: regla("sentencia ::= seleccion"); :}
-            | iteracion  {: regla("sentencia ::= iteracion"); :}
-            | escritura  {: regla("sentencia ::= escritura"); :};
+/* Reglas de paso (sin accion): no generan salida */
+sentencia ::= asignacion
+            | seleccion
+            | iteracion
+            | escritura;
 
 asignacion ::= ID:id ASIGNACION:op expresion:e PUNTO_Y_COMA
     {:
+        chequearDeclarada(id, idleft, idright);
         chequearAsignacionNumerica(id, e, opleft, opright);
         regla("asignacion ::= ID ::= expresion ;");
     :}
   | ID:id ASIGNACION:op CTE_STR PUNTO_Y_COMA
     {:
+        chequearDeclarada(id, idleft, idright);
         String t = Contexto.tabla.getTipo(id);
         if ("Integer".equals(t) || "Float".equals(t))
             throw sem("La variable numerica '" + id + "' no puede recibir una constante string", opleft, opright);
@@ -165,6 +177,7 @@ iteracion ::= WHILE PAR_A condicion PAR_C sentencias ENDWHILE
 /* Segun el enunciado: write cte_string | write cte_numerica | write variable_numerica */
 escritura ::= WRITE ID:id PUNTO_Y_COMA
               {:
+                  chequearDeclarada(id, idleft, idright);
                   if ("String".equals(Contexto.tabla.getTipo(id)))
                       throw sem("WRITE solo admite variables numericas: '" + id + "' es una variable string",
                                 idleft, idright);
@@ -179,7 +192,12 @@ condicion ::= comparacion                  {: regla("condicion ::= comparacion")
             | comparacion AND comparacion  {: regla("condicion ::= comparacion AND comparacion"); :}
             | comparacion OR comparacion   {: regla("condicion ::= comparacion OR comparacion"); :};
 
-comparacion ::= expresion comparador expresion {: regla("comparacion ::= expresion comparador expresion"); :};
+/* Cada comparacion puede ir sin parentesis propios o entre parentesis, como en el enunciado:
+   (expresion >= expresion) AND (expresion < expresion) */
+comparacion ::= expresion comparador expresion
+                {: regla("comparacion ::= expresion comparador expresion"); :}
+              | PAR_A expresion comparador expresion PAR_C
+                {: regla("comparacion ::= ( expresion comparador expresion )"); :};
 
 comparador ::= OP_MAYOR       {: regla("comparador ::= >"); :}
              | OP_MENOR       {: regla("comparador ::= <"); :}
@@ -191,11 +209,11 @@ comparador ::= OP_MAYOR       {: regla("comparador ::= >"); :}
 /* ------------------------ Expresiones ----------------------- */
 expresion ::= expresion:e OP_SUMA termino:t  {: RESULT = tipoOp(e, t); regla("expresion ::= expresion + termino"); :}
             | expresion:e OP_RESTA termino:t {: RESULT = tipoOp(e, t); regla("expresion ::= expresion - termino"); :}
-            | termino:t                      {: RESULT = t; regla("expresion ::= termino"); :};
+            | termino:t                      {: RESULT = t; :};
 
 termino ::= termino:t OP_MULT factor:f {: RESULT = tipoOp(t, f); regla("termino ::= termino * factor"); :}
           | termino:t OP_DIV factor:f  {: RESULT = tipoOp(t, f); regla("termino ::= termino / factor"); :}
-          | factor:f                   {: RESULT = f; regla("termino ::= factor"); :};
+          | factor:f                   {: RESULT = f; :};
 
 factor ::= PAR_A expresion:e PAR_C {: RESULT = e; regla("factor ::= ( expresion )"); :}
          | ID:id                   {: RESULT = tipoVariable(id, idleft, idright); regla("factor ::= ID"); :}
