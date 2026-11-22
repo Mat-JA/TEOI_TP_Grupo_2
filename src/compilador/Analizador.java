@@ -1,32 +1,30 @@
 package compilador;
 
-import java.io.IOException;
 import java.io.StringReader;
 
-/** Ejecuta el analisis lexico sobre un texto y arma la salida para mostrar. */
+/** Ejecuta el analisis lexico + sintactico + semantico sobre un texto. */
 public class Analizador {
 
-    public final StringBuilder salida = new StringBuilder();
+    public String salida;
     public TablaSimbolos tabla;
     public boolean hayError = false;
 
     public Analizador(String codigo) {
-        Lexico lexer = new Lexico(new StringReader(codigo));
-        tabla = lexer.tabla;
+        Contexto.reset();
         String nl = System.lineSeparator();
         try {
-            Token t;
-            while ((t = lexer.next_token()) != null) {
-                salida.append(t).append(nl);
-            }
-            salida.append(nl).append("Analisis lexico finalizado sin errores.").append(nl);
-        } catch (ErrorLexico e) {
+            parser p = new parser(new Lexico(new StringReader(codigo)));
+            p.parse();
+            Contexto.println(nl + "Compilacion finalizada sin errores.");
+        } catch (ErrorCompilador e) {
             hayError = true;
-            salida.append(nl).append(e).append(nl)
-                  .append("Analisis detenido en el primer error.").append(nl);
-        } catch (IOException e) {
+            Contexto.println(nl + e);
+            Contexto.println("Analisis detenido en el primer error.");
+        } catch (Exception e) {
             hayError = true;
-            salida.append("Error de lectura: ").append(e.getMessage()).append(nl);
+            Contexto.println(nl + "Error inesperado: " + e);
         }
+        salida = Contexto.salida.toString();
+        tabla = Contexto.tabla;
     }
 }

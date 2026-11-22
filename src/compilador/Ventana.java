@@ -29,7 +29,7 @@ public class Ventana extends JFrame {
     private File archivoActual = null;
 
     public Ventana() {
-        super("IDE Compilador - Grupo 2 - Analizador Lexico");
+        super("IDE Compilador - Grupo 2 - Analizador Lexico y Sintactico");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(950, 700);
         setLocationRelativeTo(null);
@@ -46,7 +46,7 @@ public class Ventana extends JFrame {
         JButton btnNuevo = new JButton("Nuevo");
         JButton btnAbrir = new JButton("Abrir archivo...");
         JButton btnGuardar = new JButton("Guardar");
-        JButton btnCompilar = new JButton("Compilar (analisis lexico)");
+        JButton btnCompilar = new JButton("Compilar");
         btnNuevo.addActionListener(e -> nuevo());
         btnAbrir.addActionListener(e -> abrir());
         btnGuardar.addActionListener(e -> guardar());

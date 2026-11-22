@@ -1,0 +1,82 @@
+INDICE DE PRUEBAS DE ERROR (archivo -> primer error que informa el compilador)
+
+lex_caracter_invalido.txt                            ERROR LEXICO (linea 5, columna 10): Caracter no permitido: <#>
+lex_cierre_comentario_suelto.txt                     ERROR LEXICO (linea 5, columna 10): Cierre de comentario '*//' sin apertura
+lex_comentario_3_niveles.txt                         ERROR LEXICO (linea 5, columna 25): Los comentarios solo pueden anidarse un nivel
+lex_comentario_sin_cerrar.txt                        ERROR LEXICO (linea 8, columna 1): Comentario sin cerrar (abierto en la linea 5)
+lex_entero_fuera_de_rango.txt                        ERROR LEXICO (linea 5, columna 8): Constante entera fuera de rango (0..32767): 32768
+lex_igual_suelto.txt                                 ERROR LEXICO (linea 5, columna 4): Caracter no permitido: <=>
+lex_real_fuera_de_rango.txt                          ERROR LEXICO (linea 5, columna 8): Constante real fuera de rango (32 bits): 99999999999999999999999999999999999999999.5
+lex_string_caracter_invalido.txt                     ERROR LEXICO (linea 5, columna 7): String mal formado (sin cerrar, con caracter no permitido o con salto de linea)
+lex_string_mas_de_30.txt                             ERROR LEXICO (linea 5, columna 7): String de mas de 30 caracteres (43): "esta cadena tiene mas de treinta caracteres"
+lex_string_sin_cerrar.txt                            ERROR LEXICO (linea 5, columna 7): String mal formado (sin cerrar, con caracter no permitido o con salto de linea)
+sem_int_recibe_expresion_real.txt                    ERROR SEMANTICO (linea 5, columna 4): La variable entera 'i1' no puede recibir un valor real
+sem_int_recibe_real.txt                              ERROR SEMANTICO (linea 5, columna 4): La variable entera 'i1' no puede recibir un valor real
+sem_mas_tipos_que_variables.txt                      ERROR SEMANTICO (linea 2, columna 8): La declaracion tiene 2 variable(s) y 3 tipo(s): no pueden existir mas variables qu
+sem_mas_variables_que_tipos.txt                      ERROR SEMANTICO (linea 2, columna 11): La declaracion tiene 3 variable(s) y 2 tipo(s): no pueden existir mas variables q
+sem_numerica_recibe_string.txt                       ERROR SEMANTICO (linea 5, columna 4): La variable numerica 'f1' no puede recibir una constante string
+sem_principio_lista_real_en_int.txt                  ERROR SEMANTICO (linea 5, columna 4): La variable entera 'i1' no puede recibir un valor real
+sem_principio_pivot_cero.txt                         ERROR SEMANTICO (linea 5, columna 8): El pivot de PRINCIPIO debe ser mayor o igual a 1 (se recibio 0)
+sem_principio_pivot_cero_lista_vacia.txt             ERROR SEMANTICO (linea 5, columna 8): El pivot de PRINCIPIO debe ser mayor o igual a 1 (se recibio 0)
+sem_string_en_expresion.txt                          ERROR SEMANTICO (linea 5, columna 8): La variable string 's1' no puede usarse en una expresion numerica
+sem_string_recibe_numero.txt                         ERROR SEMANTICO (linea 5, columna 4): A la variable string 's1' solo se le puede asignar una constante string
+sem_write_variable_string.txt                        ERROR SEMANTICO (linea 5, columna 7): WRITE solo admite variables numericas: 's1' es una variable string
+sin_asignacion_con_asig_decl.txt                     ERROR SINTACTICO (linea 5, columna 4): Token inesperado ASIG_DECL (lexema ':=')
+sin_asignacion_sin_id.txt                            ERROR SINTACTICO (linea 5, columna 1): Token inesperado ASIGNACION (lexema '::=')
+sin_asignacion_sin_valor.txt                         ERROR SINTACTICO (linea 5, columna 8): Token inesperado PUNTO_Y_COMA (lexema ';')
+sin_codigo_despues_del_fin.txt                       ERROR SINTACTICO (linea 7, columna 1): Token inesperado ID (lexema 'f1')
+sin_condicion_sin_parentesis.txt                     ERROR SINTACTICO (linea 5, columna 7): Token inesperado ID (lexema 'i1')
+sin_declaracion_asignacion_comun.txt                 ERROR SINTACTICO (linea 2, columna 6): Token inesperado ASIGNACION (lexema '::=')
+sin_declaracion_coma_final.txt                       ERROR SINTACTICO (linea 2, columna 9): Token inesperado COR_C (lexema ']')
+sin_declaracion_dentro_del_programa.txt              ERROR SINTACTICO (linea 5, columna 1): Token inesperado COR_A (lexema '[')
+sin_declaracion_lista_vacia.txt                      ERROR SINTACTICO (linea 2, columna 2): Token inesperado COR_C (lexema ']')
+sin_declaracion_sin_asig_decl.txt                    ERROR SINTACTICO (linea 2, columna 6): Token inesperado COR_A (lexema '[')
+sin_declaracion_sin_coma.txt                         ERROR SINTACTICO (linea 2, columna 5): Token inesperado ID (lexema 'i1')
+sin_declaracion_sin_corchetes.txt                    ERROR SINTACTICO (linea 2, columna 1): Token inesperado ID (lexema 'f1')
+sin_declaracion_tipo_invalido.txt                    ERROR SINTACTICO (linea 2, columna 10): Token inesperado ID (lexema 'DOUBLE')
+sin_declare_vacio.txt                                ERROR SINTACTICO (linea 2, columna 1): Token inesperado ENDDECLARE_SECTION (lexema 'ENDDECLARE.SECTION')
+sin_dos_conectores.txt                               ERROR SINTACTICO (linea 5, columna 23): Token inesperado OR (lexema 'OR')
+sin_else_sin_if.txt                                  ERROR SINTACTICO (linea 5, columna 11): Token inesperado ELSE (lexema 'ELSE')
+sin_else_sin_sentencias.txt                          ERROR SINTACTICO (linea 5, columna 33): Token inesperado ENDIF (lexema 'ENDIF')
+sin_endif_sobrante.txt                               ERROR SINTACTICO (linea 5, columna 11): Token inesperado ENDIF (lexema 'ENDIF')
+sin_endwhile_sobrante.txt                            ERROR SINTACTICO (linea 5, columna 11): Token inesperado ENDWHILE (lexema 'ENDWHILE')
+sin_expresion_dos_operadores.txt                     ERROR SINTACTICO (linea 5, columna 12): Token inesperado OP_MULT (lexema '*')
+sin_expresion_operador_final.txt                     ERROR SINTACTICO (linea 5, columna 12): Token inesperado PUNTO_Y_COMA (lexema ';')
+sin_expresion_parentesis_sin_abrir.txt               ERROR SINTACTICO (linea 5, columna 13): Token inesperado PAR_C (lexema ')')
+sin_expresion_parentesis_sin_cerrar.txt              ERROR SINTACTICO (linea 5, columna 14): Token inesperado PUNTO_Y_COMA (lexema ';')
+sin_expresion_parentesis_vacios.txt                  ERROR SINTACTICO (linea 5, columna 9): Token inesperado PAR_C (lexema ')')
+sin_falta_declare_section.txt                        ERROR SINTACTICO (linea 1, columna 1): Token inesperado PROGRAM_SECTION (lexema 'PROGRAM.SECTION')
+sin_falta_enddeclare_section.txt                     ERROR SINTACTICO (linea 3, columna 1): Token inesperado PROGRAM_SECTION (lexema 'PROGRAM.SECTION')
+sin_falta_endprogram_section.txt                     ERROR SINTACTICO: Fin de archivo inesperado: falta completar la estructura del programa
+sin_falta_program_section.txt                        ERROR SINTACTICO (linea 4, columna 1): Token inesperado ID (lexema 'f1')
+sin_falta_punto_y_coma.txt                           ERROR SINTACTICO (linea 6, columna 1): Token inesperado ID (lexema 'f1')
+sin_if_condicion_vacia.txt                           ERROR SINTACTICO (linea 5, columna 5): Token inesperado PAR_C (lexema ')')
+sin_if_conector_sin_segunda_comparacion.txt          ERROR SINTACTICO (linea 5, columna 15): Token inesperado PAR_C (lexema ')')
+sin_if_doble_comparador.txt                          ERROR SINTACTICO (linea 5, columna 12): Token inesperado OP_MENOR (lexema '<')
+sin_if_sin_comparador.txt                            ERROR SINTACTICO (linea 5, columna 7): Token inesperado PAR_C (lexema ')')
+sin_if_sin_endif.txt                                 ERROR SINTACTICO (linea 6, columna 1): Token inesperado ENDPROGRAM_SECTION (lexema 'ENDPROGRAM.SECTION')
+sin_if_sin_parentesis_de_cierre.txt                  ERROR SINTACTICO (linea 5, columna 12): Token inesperado THEN (lexema 'THEN')
+sin_if_sin_sentencias.txt                            ERROR SINTACTICO (linea 5, columna 18): Token inesperado ENDIF (lexema 'ENDIF')
+sin_if_sin_then.txt                                  ERROR SINTACTICO (linea 5, columna 13): Token inesperado WRITE (lexema 'WRITE')
+sin_principio_con_coma_en_vez_de_punto_y_coma.txt    ERROR SINTACTICO (linea 5, columna 19): Token inesperado COMA (lexema ',')
+sin_principio_lista_con_coma_final.txt               ERROR SINTACTICO (linea 5, columna 25): Token inesperado COR_C (lexema ']')
+sin_principio_lista_con_string.txt                   ERROR SINTACTICO (linea 5, columna 21): Token inesperado CTE_STR (lexema '"a"')
+sin_principio_lista_con_variable.txt                 ERROR SINTACTICO (linea 5, columna 21): Token inesperado ID (lexema 'i1')
+sin_principio_pivot_real.txt                         ERROR SINTACTICO (linea 5, columna 18): Token inesperado CTE_F (lexema '1.5')
+sin_principio_pivot_variable.txt                     ERROR SINTACTICO (linea 5, columna 18): Token inesperado ID (lexema 'i1')
+sin_principio_sin_asignacion.txt                     ERROR SINTACTICO (linea 5, columna 1): Token inesperado PRINCIPIO (lexema 'PRINCIPIO')
+sin_principio_sin_corchetes.txt                      ERROR SINTACTICO (linea 5, columna 20): Token inesperado CTE_E (lexema '2')
+sin_principio_sin_lista.txt                          ERROR SINTACTICO (linea 5, columna 20): Token inesperado PAR_C (lexema ')')
+sin_principio_sin_parentesis.txt                     ERROR SINTACTICO (linea 5, columna 18): Token inesperado CTE_E (lexema '1')
+sin_principio_sin_parentesis_de_cierre.txt           ERROR SINTACTICO (linea 5, columna 25): Token inesperado PUNTO_Y_COMA (lexema ';')
+sin_principio_sin_pivot.txt                          ERROR SINTACTICO (linea 5, columna 18): Token inesperado COR_A (lexema '[')
+sin_principio_sin_punto_y_coma_final.txt             ERROR SINTACTICO (linea 6, columna 1): Token inesperado WRITE (lexema 'WRITE')
+sin_program_vacio.txt                                ERROR SINTACTICO (linea 5, columna 1): Token inesperado ENDPROGRAM_SECTION (lexema 'ENDPROGRAM.SECTION')
+sin_secciones_invertidas.txt                         ERROR SINTACTICO (linea 1, columna 1): Token inesperado PROGRAM_SECTION (lexema 'PROGRAM.SECTION')
+sin_string_con_operador.txt                          ERROR SINTACTICO (linea 5, columna 15): Token inesperado OP_SUMA (lexema '+')
+sin_while_sin_endwhile.txt                           ERROR SINTACTICO (linea 6, columna 1): Token inesperado ENDPROGRAM_SECTION (lexema 'ENDPROGRAM.SECTION')
+sin_while_sin_sentencias.txt                         ERROR SINTACTICO (linea 5, columna 16): Token inesperado ENDWHILE (lexema 'ENDWHILE')
+sin_write_con_expresion.txt                          ERROR SINTACTICO (linea 5, columna 10): Token inesperado OP_SUMA (lexema '+')
+sin_write_dos_argumentos.txt                         ERROR SINTACTICO (linea 5, columna 10): Token inesperado ID (lexema 'f1')
+sin_write_sin_argumento.txt                          ERROR SINTACTICO (linea 5, columna 7): Token inesperado PUNTO_Y_COMA (lexema ';')
+sin_write_sin_punto_y_coma.txt                       ERROR SINTACTICO (linea 6, columna 1): Token inesperado WRITE (lexema 'WRITE')

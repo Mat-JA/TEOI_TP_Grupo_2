@@ -1,17 +1,18 @@
 /* ===================================================================
-   Lexico.flex - Primera entrega - Teoria de la Computacion I - UNLu
+   Lexico.flex - Entrega 2 (con %cup) - Teoria de la Computacion I - UNLu
    Grupo 2 - Tema especial: PRINCIPIO
    (Archivo en ASCII a proposito: JFlex lo lee con la codificacion
    por defecto del sistema, por eso no hay tildes ni enes aca.)
    =================================================================== */
 package compilador;
 
+import java_cup.runtime.*;
+
 %%
 
 %public
 %class Lexico
-%type Token
-%function next_token
+%cup
 %unicode
 %line
 %column
@@ -19,19 +20,20 @@ package compilador;
 %state COMENT
 
 %{
-    /* Tabla de simbolos que se va llenando durante el analisis */
-    public TablaSimbolos tabla = new TablaSimbolos();
-
+    
     /* Control de comentarios (se admite un solo nivel de anidamiento) */
     private int nivelComentario = 0;
     private int lineaInicioComentario = 0;
 
-    private Token tok(String nombre) {
-        return new Token(nombre, yytext(), yyline + 1, yycolumn + 1);
+    /* Muestra el token reconocido y lo entrega al parser (linea y columna base 1) */
+    private Symbol tok(int id, String nombre) {
+        Contexto.println(String.format("TOKEN  %-20s Lexema: %-22s (linea %d, columna %d)",
+                nombre, yytext(), yyline + 1, yycolumn + 1));
+        return new Symbol(id, yyline + 1, yycolumn + 1, yytext());
     }
 
-    private ErrorLexico error(String mensaje) {
-        return new ErrorLexico(mensaje, yyline + 1, yycolumn + 1);
+    private ErrorCompilador error(String mensaje) {
+        return new ErrorCompilador("LEXICO", mensaje, yyline + 1, yycolumn + 1);
     }
 %}
 
@@ -58,73 +60,74 @@ CTE_STR          = \" {CHAR_STRING}* \"
 <YYINITIAL> {
 
     /* ------------------ Palabras reservadas ------------------ */
-    "DECLARE.SECTION"        { return tok("DECLARE_SECTION"); }
-    "ENDDECLARE.SECTION"     { return tok("ENDDECLARE_SECTION"); }
-    "PROGRAM.SECTION"        { return tok("PROGRAM_SECTION"); }
-    "ENDPROGRAM.SECTION"     { return tok("ENDPROGRAM_SECTION"); }
-    "IF"                     { return tok("IF"); }
-    "THEN"                   { return tok("THEN"); }
-    "ELSE"                   { return tok("ELSE"); }
-    "ENDIF"                  { return tok("ENDIF"); }
-    "WHILE"                  { return tok("WHILE"); }
-    "ENDWHILE"               { return tok("ENDWHILE"); }
-    "WRITE"                  { return tok("WRITE"); }
-    "FLOAT"                  { return tok("FLOAT"); }
-    "INT"                    { return tok("INTEGER"); }
-    "STRING"                 { return tok("STRING"); }
-    "AND"                    { return tok("AND"); }
-    "OR"                     { return tok("OR"); }
-    "PRINCIPIO"              { return tok("PRINCIPIO"); }
+    "DECLARE.SECTION"        { return tok(sym.DECLARE_SECTION, "DECLARE_SECTION"); }
+    "ENDDECLARE.SECTION"     { return tok(sym.ENDDECLARE_SECTION, "ENDDECLARE_SECTION"); }
+    "PROGRAM.SECTION"        { return tok(sym.PROGRAM_SECTION, "PROGRAM_SECTION"); }
+    "ENDPROGRAM.SECTION"     { return tok(sym.ENDPROGRAM_SECTION, "ENDPROGRAM_SECTION"); }
+    "IF"                     { return tok(sym.IF, "IF"); }
+    "THEN"                   { return tok(sym.THEN, "THEN"); }
+    "ELSE"                   { return tok(sym.ELSE, "ELSE"); }
+    "ENDIF"                  { return tok(sym.ENDIF, "ENDIF"); }
+    "WHILE"                  { return tok(sym.WHILE, "WHILE"); }
+    "ENDWHILE"               { return tok(sym.ENDWHILE, "ENDWHILE"); }
+    /* El enunciado escribe WRITE y tambien write (seccion SALIDA): se aceptan ambas formas */
+    "WRITE" | "write"        { return tok(sym.WRITE, "WRITE"); }
+    "FLOAT"                  { return tok(sym.FLOAT, "FLOAT"); }
+    "INT"                    { return tok(sym.INTEGER, "INTEGER"); }
+    "STRING"                 { return tok(sym.STRING, "STRING"); }
+    "AND"                    { return tok(sym.AND, "AND"); }
+    "OR"                     { return tok(sym.OR, "OR"); }
+    "PRINCIPIO"              { return tok(sym.PRINCIPIO, "PRINCIPIO"); }
 
     /* ------------------ Signos y simbolos -------------------- */
-    "::="                    { return tok("ASIGNACION"); }
-    ":="                     { return tok("ASIG_DECL"); }
-    ","                      { return tok("COMA"); }
-    "."                      { return tok("PUNTO"); }
-    ";"                      { return tok("PUNTO_Y_COMA"); }
-    "("                      { return tok("PAR_A"); }
-    ")"                      { return tok("PAR_C"); }
-    "["                      { return tok("COR_A"); }
-    "]"                      { return tok("COR_C"); }
-    "{"                      { return tok("LLAV_A"); }
-    "}"                      { return tok("LLAV_C"); }
+    "::="                    { return tok(sym.ASIGNACION, "ASIGNACION"); }
+    ":="                     { return tok(sym.ASIG_DECL, "ASIG_DECL"); }
+    ","                      { return tok(sym.COMA, "COMA"); }
+    "."                      { return tok(sym.PUNTO, "PUNTO"); }
+    ";"                      { return tok(sym.PUNTO_Y_COMA, "PUNTO_Y_COMA"); }
+    "("                      { return tok(sym.PAR_A, "PAR_A"); }
+    ")"                      { return tok(sym.PAR_C, "PAR_C"); }
+    "["                      { return tok(sym.COR_A, "COR_A"); }
+    "]"                      { return tok(sym.COR_C, "COR_C"); }
+    "{"                      { return tok(sym.LLAV_A, "LLAV_A"); }
+    "}"                      { return tok(sym.LLAV_C, "LLAV_C"); }
 
     /* ------------------ Operadores --------------------------- */
-    ">="                     { return tok("OP_MAYOR_IGUAL"); }
-    "<="                     { return tok("OP_MENOR_IGUAL"); }
-    ">"                      { return tok("OP_MAYOR"); }
-    "<"                      { return tok("OP_MENOR"); }
-    "=="                     { return tok("OP_IGUAL"); }
-    "!="                     { return tok("OP_DISTINTO"); }
-    "+"                      { return tok("OP_SUMA"); }
-    "-"                      { return tok("OP_RESTA"); }
-    "*"                      { return tok("OP_MULT"); }
-    "/"                      { return tok("OP_DIV"); }
+    ">="                     { return tok(sym.OP_MAYOR_IGUAL, "OP_MAYOR_IGUAL"); }
+    "<="                     { return tok(sym.OP_MENOR_IGUAL, "OP_MENOR_IGUAL"); }
+    ">"                      { return tok(sym.OP_MAYOR, "OP_MAYOR"); }
+    "<"                      { return tok(sym.OP_MENOR, "OP_MENOR"); }
+    "=="                     { return tok(sym.OP_IGUAL, "OP_IGUAL"); }
+    "!="                     { return tok(sym.OP_DISTINTO, "OP_DISTINTO"); }
+    "+"                      { return tok(sym.OP_SUMA, "OP_SUMA"); }
+    "-"                      { return tok(sym.OP_RESTA, "OP_RESTA"); }
+    "*"                      { return tok(sym.OP_MULT, "OP_MULT"); }
+    "/"                      { return tok(sym.OP_DIV, "OP_DIV"); }
 
     /* ------------------ Identificadores ---------------------- */
     /* Va despues de las reservadas: ante igual longitud gana la
        primera regla, y "IF" debe ser palabra reservada y no ID. */
-    {ID}                     { tabla.agregarID(yytext());
-                               return tok("ID"); }
+    {ID}                     { Contexto.tabla.agregarID(yytext());
+                               return tok(sym.ID, "ID"); }
 
     /* ------------------ Constantes --------------------------- */
     {CTE_F}                  { float f = Float.parseFloat(yytext());
                                if (Float.isInfinite(f))
                                    throw error("Constante real fuera de rango (32 bits): " + yytext());
-                               tabla.agregarCteF(yytext());
-                               return tok("CTE_F"); }
+                               Contexto.tabla.agregarCteF(yytext());
+                               return tok(sym.CTE_F, "CTE_F"); }
 
     {CTE_E}                  { if (new java.math.BigInteger(yytext())
                                        .compareTo(java.math.BigInteger.valueOf(32767)) > 0)
                                    throw error("Constante entera fuera de rango (0..32767): " + yytext());
-                               tabla.agregarCteE(yytext());
-                               return tok("CTE_E"); }
+                               Contexto.tabla.agregarCteE(yytext());
+                               return tok(sym.CTE_E, "CTE_E"); }
 
     {CTE_STR}                { String valor = yytext().substring(1, yytext().length() - 1);
                                if (valor.length() > 30)
                                    throw error("String de mas de 30 caracteres (" + valor.length() + "): " + yytext());
-                               tabla.agregarCteStr(valor);
-                               return tok("CTE_STR"); }
+                               Contexto.tabla.agregarCteStr(valor);
+                               return tok(sym.CTE_STR, "CTE_STR"); }
 
     /* ------------------ Comentarios -------------------------- */
     "//*"                    { nivelComentario = 1;
@@ -139,7 +142,7 @@ CTE_STR          = \" {CHAR_STRING}* \"
     /* ------------------ Errores ------------------------------ */
     \"                       { throw error("String mal formado (sin cerrar, con caracter no permitido o con salto de linea)"); }
 
-    <<EOF>>                  { return null; }
+    <<EOF>>                  { return new Symbol(sym.EOF); }
 }
 
 <COMENT> {
@@ -151,7 +154,7 @@ CTE_STR          = \" {CHAR_STRING}* \"
     "*//"                    { nivelComentario--;
                                if (nivelComentario == 0) yybegin(YYINITIAL); }
     [^]                      { /* el contenido del comentario se ignora */ }
-    <<EOF>>                  { throw new ErrorLexico("Comentario sin cerrar (abierto en la linea "
+    <<EOF>>                  { throw new ErrorCompilador("LEXICO", "Comentario sin cerrar (abierto en la linea "
                                    + lineaInicioComentario + ")", yyline + 1, yycolumn + 1); }
 }
 

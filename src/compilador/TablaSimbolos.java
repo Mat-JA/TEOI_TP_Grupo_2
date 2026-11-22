@@ -19,7 +19,8 @@ import java.util.Map;
 public class TablaSimbolos {
 
     public static class Entrada {
-        public final String nombre, token, tipo, valor, longitud;
+        public final String nombre, token, valor, longitud;
+        public String tipo;
 
         Entrada(String nombre, String token, String tipo, String valor, String longitud) {
             this.nombre = nombre;
@@ -57,6 +58,18 @@ public class TablaSimbolos {
                 valorSinComillas, String.valueOf(valorSinComillas.length())));
     }
 
+    /** Tipo declarado de una variable ("Integer", "Float", "String") o "-" si no tiene. */
+    public String getTipo(String id) {
+        Entrada e = entradas.get("ID|" + id);
+        return e == null ? VACIO : e.tipo;
+    }
+
+    /** Asigna el tipo a una variable; si ya tenia uno (declarada dos veces) se conserva el primero. */
+    public void setTipo(String id, String tipo) {
+        Entrada e = entradas.get("ID|" + id);
+        if (e != null && VACIO.equals(e.tipo)) e.tipo = tipo;
+    }
+
     public List<Entrada> getEntradas() {
         return new ArrayList<>(entradas.values());
     }
@@ -67,6 +80,7 @@ public class TablaSimbolos {
         for (Entrada e : entradas.values()) {
             wNombre = Math.max(wNombre, e.nombre.length());
             wToken = Math.max(wToken, e.token.length());
+            wTipo = Math.max(wTipo, e.tipo.length());
             wValor = Math.max(wValor, e.valor.length());
         }
         String fmt = "%-" + wNombre + "s | %-" + wToken + "s | %-" + wTipo + "s | %-"

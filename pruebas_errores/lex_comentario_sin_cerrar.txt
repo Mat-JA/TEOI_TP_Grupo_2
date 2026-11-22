@@ -1,0 +1,7 @@
+DECLARE.SECTION
+[f1, i1, s1] := [FLOAT, INT, STRING]
+ENDDECLARE.SECTION
+PROGRAM.SECTION
+//* comentario que nunca se cierra
+i1 ::= 1;
+ENDPROGRAM.SECTION

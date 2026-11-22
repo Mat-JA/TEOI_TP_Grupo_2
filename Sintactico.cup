@@ -1,0 +1,223 @@
+/* ===================================================================
+   Sintactico.cup - Segunda entrega - Teoria de la Computacion I - UNLu
+   Grupo 2 - Tema especial: PRINCIPIO
+   (ASCII a proposito, igual que Lexico.flex)
+   =================================================================== */
+package compilador;
+
+import java_cup.runtime.*;
+
+parser code {:
+    /* Ante el primer error sintactico se corta el analisis. */
+    public void syntax_error(Symbol s) {
+        if (s.sym == sym.EOF) {
+            throw new ErrorCompilador("SINTACTICO",
+                "Fin de archivo inesperado: falta completar la estructura del programa", 0, 0);
+        }
+        String nombre = (s.sym >= 0 && s.sym < sym.terminalNames.length) ? sym.terminalNames[s.sym] : "?";
+        throw new ErrorCompilador("SINTACTICO",
+            "Token inesperado " + nombre + " (lexema '" + s.value + "')", s.left, s.right);
+    }
+:}
+
+action code {:
+    void regla(String texto) {
+        Contexto.println("      >> Regla: " + texto);
+    }
+
+    ErrorCompilador sem(String mensaje, int linea, int columna) {
+        return new ErrorCompilador("SEMANTICO", mensaje, linea, columna);
+    }
+
+    /* Tipo de una variable para usarla en una expresion: "Integer", "Float" o "?" (sin declarar) */
+    String tipoVariable(String id, int linea, int columna) {
+        String t = Contexto.tabla.getTipo(id);
+        if ("String".equals(t))
+            throw sem("La variable string '" + id + "' no puede usarse en una expresion numerica", linea, columna);
+        if ("Integer".equals(t) || "Float".equals(t)) return t;
+        return "?";
+    }
+
+    /* Tipo resultante de operar dos operandos */
+    String tipoOp(String a, String b) {
+        if ("Float".equals(a) || "Float".equals(b)) return "Float";
+        if ("?".equals(a) || "?".equals(b)) return "?";
+        return "Integer";
+    }
+
+    /* Compatibilidad de una asignacion numerica: una variable Integer no recibe un valor Float */
+    void chequearAsignacionNumerica(String id, String tipoValor, int linea, int columna) {
+        String t = Contexto.tabla.getTipo(id);
+        if ("String".equals(t))
+            throw sem("A la variable string '" + id + "' solo se le puede asignar una constante string", linea, columna);
+        if ("Integer".equals(t) && "Float".equals(tipoValor))
+            throw sem("La variable entera '" + id + "' no puede recibir un valor real", linea, columna);
+    }
+
+    /* PRINCIPIO(pivot; [lista de constantes numericas]): pivot < 1 es error; lista vacia o pivot
+       mayor al largo emiten mensaje y el resultado es 0; si no, informa la suma de las primeras
+       posiciones. El resultado es Float si algun valor de la lista es real, si no Integer. */
+    String evaluarPrincipio(String pivotTxt, java.util.List valores, int linea, int columna) {
+        int pivot = Integer.parseInt(pivotTxt);
+        String pos = "MENSAJE (linea " + linea + ", columna " + columna + "): ";
+        boolean real = false;
+        for (int i = 0; i < valores.size(); i++)
+            if (((String) valores.get(i)).indexOf('.') >= 0) real = true;
+        if (pivot < 1)
+            throw sem("El pivot de PRINCIPIO debe ser mayor o igual a 1 (se recibio " + pivot + ")", linea, columna);
+        if (valores.isEmpty()) {
+            Contexto.println(pos + "La lista est\u00e1 vac\u00eda. El resultado de PRINCIPIO es 0.");
+        } else if (pivot > valores.size()) {
+            Contexto.println(pos + "La lista no tiene suficientes elementos (pivot " + pivot + ", elementos "
+                             + valores.size() + "). El resultado de PRINCIPIO es 0.");
+        } else {
+            java.math.BigDecimal suma = java.math.BigDecimal.ZERO;
+            for (int i = 0; i < pivot; i++) suma = suma.add(new java.math.BigDecimal((String) valores.get(i)));
+            Contexto.println(pos + "PRINCIPIO suma las primeras " + pivot + " posiciones: " + suma.toPlainString());
+        }
+        return real ? "Float" : "Integer";
+    }
+:}
+
+/* ------------------------ Terminales ------------------------ */
+terminal DECLARE_SECTION, ENDDECLARE_SECTION, PROGRAM_SECTION, ENDPROGRAM_SECTION;
+terminal IF, THEN, ELSE, ENDIF, WHILE, ENDWHILE, WRITE, FLOAT, INTEGER, STRING, AND, OR, PRINCIPIO;
+terminal ASIGNACION, ASIG_DECL, COMA, PUNTO, PUNTO_Y_COMA, PAR_A, PAR_C, COR_A, COR_C, LLAV_A, LLAV_C;
+terminal OP_MAYOR_IGUAL, OP_MENOR_IGUAL, OP_MAYOR, OP_MENOR, OP_IGUAL, OP_DISTINTO;
+terminal OP_SUMA, OP_RESTA, OP_MULT, OP_DIV;
+terminal String ID, CTE_E, CTE_F, CTE_STR;
+
+/* ---------------------- No terminales ----------------------- */
+non terminal programa, declaraciones, declaracion;
+non terminal sentencias, sentencia, asignacion, seleccion, iteracion, escritura;
+non terminal condicion, comparacion, comparador;
+non terminal java.util.List lista_tipos, lista_id, lista_cte;
+non terminal String tipo, expresion, termino, factor, principio, cte;
+
+start with programa;
+
+/* ------------------------ Programa -------------------------- */
+programa ::= DECLARE_SECTION declaraciones ENDDECLARE_SECTION PROGRAM_SECTION sentencias ENDPROGRAM_SECTION
+    {: regla("programa ::= DECLARE.SECTION declaraciones ENDDECLARE.SECTION PROGRAM.SECTION sentencias ENDPROGRAM.SECTION"); :};
+
+/* ---------------------- Declaraciones ----------------------- */
+declaraciones ::= declaraciones declaracion {: regla("declaraciones ::= declaraciones declaracion"); :}
+                | declaracion               {: regla("declaraciones ::= declaracion"); :};
+
+/* Formato (correccion de los profes): [lista de variables] := [lista de tipos], se corresponden por posicion */
+declaracion ::= COR_A lista_id:vs COR_C ASIG_DECL:op COR_A lista_tipos:ts COR_C
+    {:
+        if (ts.size() != vs.size())
+            throw sem("La declaracion tiene " + vs.size() + " variable(s) y " + ts.size()
+                      + " tipo(s): no pueden existir mas variables que tipos ni mas tipos que variables",
+                      opleft, opright);
+        for (int i = 0; i < vs.size(); i++)
+            Contexto.tabla.setTipo((String) vs.get(i), (String) ts.get(i));
+        regla("declaracion ::= [lista_id] := [lista_tipos]");
+    :};
+
+lista_tipos ::= lista_tipos:l COMA tipo:t
+                {: l.add(t); RESULT = l; regla("lista_tipos ::= lista_tipos , tipo"); :}
+              | tipo:t
+                {: java.util.List nueva = new java.util.ArrayList(); nueva.add(t); RESULT = nueva;
+                   regla("lista_tipos ::= tipo"); :};
+
+lista_id ::= lista_id:l COMA ID:id
+             {: l.add(id); RESULT = l; regla("lista_id ::= lista_id , ID"); :}
+           | ID:id
+             {: java.util.List nueva = new java.util.ArrayList(); nueva.add(id); RESULT = nueva;
+                regla("lista_id ::= ID"); :};
+
+tipo ::= INTEGER {: RESULT = "Integer"; regla("tipo ::= INT"); :}
+       | FLOAT   {: RESULT = "Float";   regla("tipo ::= FLOAT"); :}
+       | STRING  {: RESULT = "String";  regla("tipo ::= STRING"); :};
+
+/* ------------------------ Sentencias ------------------------ */
+sentencias ::= sentencias sentencia {: regla("sentencias ::= sentencias sentencia"); :}
+             | sentencia            {: regla("sentencias ::= sentencia"); :};
+
+sentencia ::= asignacion {: regla("sentencia ::= asignacion"); :}
+            | seleccion  {: regla("sentencia ::= seleccion"); :}
+            | iteracion  {: regla("sentencia ::= iteracion"); :}
+            | escritura  {: regla("sentencia ::= escritura"); :};
+
+asignacion ::= ID:id ASIGNACION:op expresion:e PUNTO_Y_COMA
+    {:
+        chequearAsignacionNumerica(id, e, opleft, opright);
+        regla("asignacion ::= ID ::= expresion ;");
+    :}
+  | ID:id ASIGNACION:op CTE_STR PUNTO_Y_COMA
+    {:
+        String t = Contexto.tabla.getTipo(id);
+        if ("Integer".equals(t) || "Float".equals(t))
+            throw sem("La variable numerica '" + id + "' no puede recibir una constante string", opleft, opright);
+        regla("asignacion ::= ID ::= CTE_STR ;");
+    :};
+
+seleccion ::= IF PAR_A condicion PAR_C THEN sentencias ELSE sentencias ENDIF
+              {: regla("seleccion ::= IF ( condicion ) THEN sentencias ELSE sentencias ENDIF"); :}
+            | IF PAR_A condicion PAR_C THEN sentencias ENDIF
+              {: regla("seleccion ::= IF ( condicion ) THEN sentencias ENDIF"); :};
+
+iteracion ::= WHILE PAR_A condicion PAR_C sentencias ENDWHILE
+              {: regla("iteracion ::= WHILE ( condicion ) sentencias ENDWHILE"); :};
+
+/* Segun el enunciado: write cte_string | write cte_numerica | write variable_numerica */
+escritura ::= WRITE ID:id PUNTO_Y_COMA
+              {:
+                  if ("String".equals(Contexto.tabla.getTipo(id)))
+                      throw sem("WRITE solo admite variables numericas: '" + id + "' es una variable string",
+                                idleft, idright);
+                  regla("escritura ::= WRITE ID ;");
+              :}
+            | WRITE CTE_E PUNTO_Y_COMA   {: regla("escritura ::= WRITE CTE_E ;"); :}
+            | WRITE CTE_F PUNTO_Y_COMA   {: regla("escritura ::= WRITE CTE_F ;"); :}
+            | WRITE CTE_STR PUNTO_Y_COMA {: regla("escritura ::= WRITE CTE_STR ;"); :};
+
+/* ------------------------ Condiciones ----------------------- */
+condicion ::= comparacion                  {: regla("condicion ::= comparacion"); :}
+            | comparacion AND comparacion  {: regla("condicion ::= comparacion AND comparacion"); :}
+            | comparacion OR comparacion   {: regla("condicion ::= comparacion OR comparacion"); :};
+
+comparacion ::= expresion comparador expresion {: regla("comparacion ::= expresion comparador expresion"); :};
+
+comparador ::= OP_MAYOR       {: regla("comparador ::= >"); :}
+             | OP_MENOR       {: regla("comparador ::= <"); :}
+             | OP_MAYOR_IGUAL {: regla("comparador ::= >="); :}
+             | OP_MENOR_IGUAL {: regla("comparador ::= <="); :}
+             | OP_IGUAL       {: regla("comparador ::= =="); :}
+             | OP_DISTINTO    {: regla("comparador ::= !="); :};
+
+/* ------------------------ Expresiones ----------------------- */
+expresion ::= expresion:e OP_SUMA termino:t  {: RESULT = tipoOp(e, t); regla("expresion ::= expresion + termino"); :}
+            | expresion:e OP_RESTA termino:t {: RESULT = tipoOp(e, t); regla("expresion ::= expresion - termino"); :}
+            | termino:t                      {: RESULT = t; regla("expresion ::= termino"); :};
+
+termino ::= termino:t OP_MULT factor:f {: RESULT = tipoOp(t, f); regla("termino ::= termino * factor"); :}
+          | termino:t OP_DIV factor:f  {: RESULT = tipoOp(t, f); regla("termino ::= termino / factor"); :}
+          | factor:f                   {: RESULT = f; regla("termino ::= factor"); :};
+
+factor ::= PAR_A expresion:e PAR_C {: RESULT = e; regla("factor ::= ( expresion )"); :}
+         | ID:id                   {: RESULT = tipoVariable(id, idleft, idright); regla("factor ::= ID"); :}
+         | CTE_E                   {: RESULT = "Integer"; regla("factor ::= CTE_E"); :}
+         | CTE_F                   {: RESULT = "Float";   regla("factor ::= CTE_F"); :}
+         | principio:p             {: RESULT = p; regla("factor ::= principio"); :};
+
+/* ---------------- Tema especial: PRINCIPIO ------------------- */
+/* PRINCIPIO(constante_entera; [lista de constantes numericas]) puede formar parte de una expresion */
+principio ::= PRINCIPIO:pr PAR_A CTE_E:pv PUNTO_Y_COMA COR_A lista_cte:lc COR_C PAR_C
+              {: RESULT = evaluarPrincipio(pv, lc, prleft, prright);
+                 regla("principio ::= PRINCIPIO ( CTE_E ; [ lista_cte ] )"); :}
+            | PRINCIPIO:pr PAR_A CTE_E:pv PUNTO_Y_COMA COR_A COR_C PAR_C
+              {: RESULT = evaluarPrincipio(pv, new java.util.ArrayList(), prleft, prright);
+                 regla("principio ::= PRINCIPIO ( CTE_E ; [ ] )"); :};
+
+lista_cte ::= lista_cte:l COMA cte:c
+              {: l.add(c); RESULT = l; regla("lista_cte ::= lista_cte , cte"); :}
+            | cte:c
+              {: java.util.List nueva = new java.util.ArrayList(); nueva.add(c); RESULT = nueva;
+                 regla("lista_cte ::= cte"); :};
+
+/* Constantes numericas de la lista: se guarda el lexema */
+cte ::= CTE_E:c {: RESULT = c; regla("cte ::= CTE_E"); :}
+      | CTE_F:c {: RESULT = c; regla("cte ::= CTE_F"); :};
